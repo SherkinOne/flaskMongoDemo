@@ -11,24 +11,20 @@ import bson
 
 from flask import current_app, g
 from werkzeug.local import LocalProxy
-from flask_pymongo import PyMongo
+# from flask_pymongo import PyMongo
+from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError, OperationFailure
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-
+ 
 def get_db():
-    """
-    Configuration method to return db instance
-    """
-    db = getattr(g, "_database", None)
-
-    if db is None:
-
-        db = g._database = PyMongo(current_app).db
-       
+    connection_string = .....
+    db = MongoClient(connection_string).sample_mflix 
+    if 'sample_mflix' not in g:
+        print("Noit")
+        db = MongoClient( connection_string).sample_mflix  # Connect to MongoDB and assign to g
     return db
-
 
 # Use LocalProxy to read the global db instance with just `db`
 db = LocalProxy(get_db)
@@ -181,7 +177,7 @@ def get_movies(filters, page, movies_per_page):
         cursor = db.movies.find(query, project).sort(sort)
     else:
         cursor = db.movies.find(query).sort(sort)
-
+    print("Eerr")
     total_num_movies = 0
     if page == 0:
         total_num_movies = db.movies.count_documents(query)
@@ -203,8 +199,8 @@ def get_movie(id):
             {
                 "$match": {
                     "_id": ObjectId(id)
-                }
-            }
+                },
+            },
         ]
 
         movie = db.movies.aggregate(pipeline).next()
